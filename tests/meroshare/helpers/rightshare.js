@@ -4,6 +4,8 @@
 
 const { waitForPageReady } = require('./common');
 
+const RIGHT_SHARE_PATTERN = /right\s+share/i;
+
 /**
  * Check if "Apply" button exists on My ASBA page for a Right Share issue
  * @param {import('@playwright/test').Page} page - Playwright page object
@@ -60,7 +62,7 @@ async function checkForRightShareApplyButton(page) {
         const rowText = await row.textContent({ timeout: 2000 });
 
         // Only process rows containing "Right Share"
-        if (!/right\s+share/i.test(rowText)) {
+        if (!RIGHT_SHARE_PATTERN.test(rowText)) {
           continue;
         }
 
@@ -138,7 +140,7 @@ async function checkForRightShareApplyButton(page) {
         try {
           const rowHTML = await row.innerHTML({ timeout: 1000 });
 
-          if (!/right\s+share/i.test(rowHTML)) {
+          if (!RIGHT_SHARE_PATTERN.test(rowHTML)) {
             continue;
           }
 

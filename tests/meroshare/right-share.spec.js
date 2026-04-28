@@ -300,8 +300,8 @@ test.describe('MeroShare Right Share Automation', () => {
             );
             break;
         }
-      } catch (notifyError) {
-        console.error(`Failed to send Telegram notification: ${notifyError.message}`);
+      } catch (notificationError) {
+        console.error(`Failed to send Telegram notification: ${notificationError.message}`);
       }
     }
 
