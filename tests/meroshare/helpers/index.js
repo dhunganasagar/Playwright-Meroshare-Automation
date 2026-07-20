@@ -8,6 +8,7 @@ const navigation = require('./navigation');
 const common = require('./common');
 const asba = require('./asba');
 const ipo = require('./ipo');
+const rightshare = require('./rightshare');
 const telegram = require('./telegram');
 const retry = require('./retry');
 
@@ -17,6 +18,7 @@ module.exports = {
   ...common,
   ...asba,
   ...ipo,
+  ...rightshare,
   ...telegram,
   ...retry,
 };

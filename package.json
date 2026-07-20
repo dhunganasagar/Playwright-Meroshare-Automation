@@ -12,7 +12,11 @@
     "automate": "playwright test tests/meroshare/login.spec.js",
     "automate:headed": "playwright test tests/meroshare/login.spec.js --headed",
     "automate:multi": "playwright test tests/meroshare/multi-user.spec.js",
-    "automate:multi:headed": "playwright test tests/meroshare/multi-user.spec.js --headed"
+    "automate:multi:headed": "playwright test tests/meroshare/multi-user.spec.js --headed",
+    "automate:right-share": "playwright test tests/meroshare/right-share.spec.js",
+    "automate:right-share:headed": "playwright test tests/meroshare/right-share.spec.js --headed",
+    "automate:right-share:multi": "playwright test tests/meroshare/right-share-multi-user.spec.js",
+    "automate:right-share:multi:headed": "playwright test tests/meroshare/right-share-multi-user.spec.js --headed"
   },
   "keywords": [
     "playwright",

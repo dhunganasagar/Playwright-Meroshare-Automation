@@ -1,6 +1,6 @@
-# MeroShare IPO Automation with Playwright
+# MeroShare IPO & Right Share Automation with Playwright
 
-Automated IPO application system for MeroShare (https://meroshare.cdsc.com.np) using Playwright.
+Automated IPO and Right Share application system for MeroShare (https://meroshare.cdsc.com.np) using Playwright.
 
 <p align="center">
   <img src="screenshot/Telegram%20Notification.png" width="200" alt="Telegram Notification">
@@ -10,6 +10,7 @@ Automated IPO application system for MeroShare (https://meroshare.cdsc.com.np) u
 
 ## 🎯 What It Does
 
+### IPO Automation
 1. **Logs in** to MeroShare with your credentials
 2. **Navigates** to "My ASBA" page
 3. **Scans for IPOs** - Only processes **Ordinary Shares** (ignores Mutual Funds, etc.)
@@ -24,6 +25,19 @@ Automated IPO application system for MeroShare (https://meroshare.cdsc.com.np) u
    - ✅ Success: IPO applied
    - ⚠️ Needs Review: IPO open but didn't meet criteria
    - ❌ No IPO: Nothing available
+
+### Right Share Automation
+1. **Logs in** to MeroShare with your credentials
+2. **Navigates** to "My ASBA" page
+3. **Scans for Right Shares** - Detects issues with "Right Share" in their share group
+4. **Applies automatically** if available:
+   - Fills form (Bank, Account, Kitta, CRN)
+   - Enters Transaction PIN
+   - Submits application
+5. **Sends Telegram notifications**:
+   - ✅ Success: Right Share applied
+   - ⚠️ Needs Review: Right Share found but credentials missing
+   - ❌ No Right Share: Nothing available
 
 ## Setup
 
@@ -44,7 +58,7 @@ Automated IPO application system for MeroShare (https://meroshare.cdsc.com.np) u
    MEROSHARE_PASSWORD=your_password
    MEROSHARE_DP_NP=your_depository_participant
    
-   # IPO Application Settings
+   # IPO / Right Share Application Settings
    MEROSHARE_BANK=your_bank_name
    MEROSHARE_P_ACCOUNT_NO=your_account_number
    MEROSHARE_KITTA_N0=10
@@ -85,13 +99,54 @@ Automated IPO application system for MeroShare (https://meroshare.cdsc.com.np) u
 
 ## Running
 
+### IPO Automation
 ```bash
-# Run automation (headless)
+# Run IPO automation (headless)
 npm run automate
 
 # Run with browser visible
 npm run automate:headed
+
+# Run for multiple users
+npm run automate:multi
+npm run automate:multi:headed
 ```
+
+### Right Share Automation
+```bash
+# Run Right Share automation (headless)
+npm run automate:right-share
+
+# Run with browser visible
+npm run automate:right-share:headed
+
+# Run for multiple users
+npm run automate:right-share:multi
+npm run automate:right-share:multi:headed
+```
+
+### Right Share Configuration
+
+Right Share automation uses the **same configuration fields** as IPO automation. No additional `.env` variables are needed:
+
+| Variable | Description | Required |
+|---|---|---|
+| `MEROSHARE_USERNAME` | Your MeroShare username | ✅ |
+| `MEROSHARE_PASSWORD` | Your MeroShare password | ✅ |
+| `MEROSHARE_DP_NP` | Depository Participant name | ✅ |
+| `MEROSHARE_BANK` | Bank name for payment | For auto-apply |
+| `MEROSHARE_P_ACCOUNT_NO` | Bank account number | For auto-apply |
+| `MEROSHARE_KITTA_N0` | Number of shares to apply for | For auto-apply |
+| `MEROSHARE_CRN_NO` | CRN number | For auto-apply |
+| `MEROSHARE_TXN_PIN` | Transaction PIN | For auto-apply |
+
+> **Note:** If `MEROSHARE_BANK`, `MEROSHARE_P_ACCOUNT_NO`, `MEROSHARE_KITTA_N0`, or `MEROSHARE_CRN_NO` are missing, the automation will detect the Right Share but skip auto-apply and notify you to apply manually.
+
+### Right Share Limitations
+
+- The automation detects Right Shares by searching for "Right Share" text in the share group/type on the My ASBA page.
+- Unlike IPO automation, Right Shares do **not** require the share value/min unit verification step.
+- Right Share eligibility (whether you hold the parent company's shares) is determined by MeroShare; the automation will report an error if you are not eligible.
 
 ## GitHub Actions (Cloud Automation)
 
@@ -144,18 +199,24 @@ If you want to manage secrets as code, use the `infra/` folder:
 
 ```
 ├── tests/meroshare/
-│   ├── login.spec.js          # Main test orchestration
+│   ├── login.spec.js                    # IPO automation (single user)
+│   ├── multi-user.spec.js               # IPO automation (multi-user)
+│   ├── right-share.spec.js              # Right Share automation (single user)
+│   ├── right-share-multi-user.spec.js   # Right Share automation (multi-user)
 │   └── helpers/
 │       ├── index.js           # Central export
 │       ├── login.js           # DP selection & authentication
 │       ├── navigation.js      # My ASBA navigation
 │       ├── asba.js            # IPO detection & verification
 │       ├── ipo.js             # Form filling & submission
+│       ├── rightshare.js      # Right Share detection & status check
 │       ├── telegram.js        # Notifications
-│       └── common.js          # Utilities
+│       ├── common.js          # Utilities
+│       └── retry.js           # Retry helpers
 ├── .github/workflows/
 │   └── meroshare-automation.yml
 ├── playwright.config.js
+├── users.config.js
 ├── .env
 └── package.json
 ```
@@ -164,11 +225,14 @@ If you want to manage secrets as code, use the `infra/` folder:
 
 - ✅ Auto-login with DP selection
 - ✅ Ordinary Shares detection (filters out Mutual Funds)
-- ✅ Share verification (Value Per Unit & Min Unit)
-- ✅ Auto-fill IPO application form
+- ✅ Right Share detection and auto-apply
+- ✅ Share verification (Value Per Unit & Min Unit) for IPOs
+- ✅ Auto-fill application form (Bank, Account, Kitta, CRN, PIN)
+- ✅ Multi-user support (up to 10 users)
 - ✅ Telegram notifications
 - ✅ GitHub Actions scheduled automation
 - ✅ Element-based waits (reliable)
+- ✅ Retry logic for high-traffic scenarios
 ## Resources
 
 - [Playwright Documentation](https://playwright.dev)
